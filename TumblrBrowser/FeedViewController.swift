@@ -80,7 +80,7 @@ class FeedViewController: UITableViewController {
     private func setupView() {
         self.tableView.register(PostPrototypeCell.self, forCellReuseIdentifier: "postCell")
         self.tableView.rowHeight = UITableViewAutomaticDimension
-        self.tableView.estimatedRowHeight = 200
+        self.tableView.estimatedRowHeight = 500
     }
 
     private func setupSearchController() {

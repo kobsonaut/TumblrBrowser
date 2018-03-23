@@ -26,7 +26,8 @@ class PostPrototypeCell: UITableViewCell {
     var postImageView : UIImageView = {
         var imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.contentMode = .scaleAspectFit
+        imageView.clipsToBounds = true
+        imageView.contentMode = .scaleAspectFill
         return imageView
     }()
 
@@ -67,13 +68,12 @@ class PostPrototypeCell: UITableViewCell {
         postImageView.leftAnchor.constraint(equalTo: self.leftAnchor).isActive = true
         postImageView.rightAnchor.constraint(equalTo: self.rightAnchor).isActive = true
         postImageView.bottomAnchor.constraint(equalTo: self.customSeparatorView.topAnchor).isActive = true
-        postImageView.heightAnchor.constraint(equalToConstant: 250).isActive = true
+        postImageView.heightAnchor.constraint(equalTo: widthAnchor ).isActive = true
 
         customSeparatorView.leftAnchor.constraint(equalTo: self.leftAnchor).isActive = true
         customSeparatorView.rightAnchor.constraint(equalTo: self.rightAnchor).isActive = true
         customSeparatorView.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
         customSeparatorView.heightAnchor.constraint(equalToConstant: 15).isActive = true
-
 
 
     }
