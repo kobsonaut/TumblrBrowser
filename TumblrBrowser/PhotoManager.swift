@@ -19,7 +19,6 @@ class PhotoManager {
     func getPhoto(from url: URL, completion: @escaping ((UIImage?) -> Void)) {
         var image: UIImage? = nil
         if let image = self.cache[url] {
-
             completion(image)
         } else {
 
