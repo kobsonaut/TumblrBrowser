@@ -12,7 +12,7 @@ import UIKit
 class FeedViewController: UITableViewController, UISearchBarDelegate {
 
     var searchController : UISearchController!
-    var posts: [ImagePost] = []
+    var posts: [Any] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,7 +21,8 @@ class FeedViewController: UITableViewController, UISearchBarDelegate {
     }
 
     private func setupView() {
-        self.tableView.register(ImagePrototypeCell.self, forCellReuseIdentifier: "postCell")
+        self.tableView.register(ImagePrototypeCell.self, forCellReuseIdentifier: "imageCell")
+        self.tableView.register(TextPrototypeCell.self, forCellReuseIdentifier: "textCell")
         self.tableView.rowHeight = UITableViewAutomaticDimension
         self.tableView.estimatedRowHeight = 300
     }
@@ -35,19 +36,23 @@ class FeedViewController: UITableViewController, UISearchBarDelegate {
             if postsRange > 0 {
                 for i in 0..<postsRange {
                     guard let postType = xml[0][1][i].attributes["type"] else { return }
-                    if postType == "photo" {
-                        guard let name = xml[0][1][i]["tumblelog"]?.attributes["name"] else { return }
-                        guard let imageURL = xml[0][1][i]["photo-url"]?.text else { return }
-                        guard let profileImage = xml[0][1][i]["tumblelog"]?.attributes["avatar-url-40"] else { return }
 
+                    guard let name = xml[0][1][i]["tumblelog"]?.attributes["name"] else { return }
+                    guard let profileImage = xml[0][1][i]["tumblelog"]?.attributes["avatar-url-40"] else { return }
+                    let profileImageURL = URL(string: profileImage)
+
+                    if postType == "photo" {
+                        guard let imageURL = xml[0][1][i]["photo-url"]?.text else { return }
                         let postImageURL = URL(string: imageURL)
-                        let profileImageURL = URL(string: profileImage)
 
                         let post = ImagePost(profileName: name, profileImageURL: profileImageURL, imageURL: postImageURL, type: postType)
                         self.posts.append(post)
+
                     } else if postType == "regular" {
                         guard let message = xml[0][1][i]["regular-body"]?.text else { return }
-                        let post = TextPost(profileName: self.name, profileImageURL: self.profileImageURL, message: message, type: postType)
+                        print(message)
+                        let post = TextPost(profileName: name, profileImageURL: profileImageURL, message: message, type: postType)
+                        self.posts.append(post)
                     } else {
                         print("Different type.")
                     }
@@ -63,30 +68,52 @@ class FeedViewController: UITableViewController, UISearchBarDelegate {
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = self.tableView.dequeueReusableCell(withIdentifier: "postCell", for: indexPath) as! ImagePrototypeCell
-        cell.profileName = posts[indexPath.row].profileName
-        OperationQueue.main.addOperation {
-            let profileImageUrl: URL? = self.posts[indexPath.row].profileImageURL
-            if let imageUrl = profileImageUrl {
-                PhotoManager.shared.getPhoto(from: imageUrl, completion: {(image) -> (Void) in
-                    if let image = image {
-                        cell.profileImageView.image = image
-                    }
-                })
-            }
 
-            let postImageUrl: URL? = self.posts[indexPath.row].imageURL
-            if let imageUrl = postImageUrl {
-                cell.postImageView.image = #imageLiteral(resourceName: "placeholder")
-                PhotoManager.shared.getPhoto(from: imageUrl, completion: {(image) -> (Void) in
-                    if let image = image {
-                        cell.postImageView.image = image
-                    }
-                })
+        if let imagePost = posts[indexPath.row] as? ImagePost {
+            let cell = self.tableView.dequeueReusableCell(withIdentifier: "imageCell", for: indexPath) as! ImagePrototypeCell
+            cell.profileName = imagePost.profileName
+            OperationQueue.main.addOperation {
+                let profileImageUrl: URL? = imagePost.profileImageURL
+                if let imageUrl = profileImageUrl {
+                    PhotoManager.shared.getPhoto(from: imageUrl, completion: {(image) -> (Void) in
+                        if let image = image {
+                            cell.profileImageView.image = image
+                        }
+                    })
+                }
+
+                let postImageUrl: URL? = imagePost.imageURL
+                if let imageUrl = postImageUrl {
+                    cell.postImageView.image = #imageLiteral(resourceName: "placeholder")
+                    PhotoManager.shared.getPhoto(from: imageUrl, completion: {(image) -> (Void) in
+                        if let image = image {
+                            cell.postImageView.image = image
+                        }
+                    })
+                }
             }
+            cell.layoutSubviews()
+
+            return cell
+        } else if let textPost = posts[indexPath.row] as? TextPost {
+            let cell = self.tableView.dequeueReusableCell(withIdentifier: "textCell", for: indexPath) as! TextPrototypeCell
+            cell.profileName = textPost.profileName
+            cell.message = textPost.message
+            OperationQueue.main.addOperation {
+                let profileImageUrl: URL? = textPost.profileImageURL
+                if let imageUrl = profileImageUrl {
+                    PhotoManager.shared.getPhoto(from: imageUrl, completion: {(image) -> (Void) in
+                        if let image = image {
+                            cell.profileImageView.image = image
+                        }
+                    })
+                }
+            }
+            cell.layoutSubviews()
+            return cell
         }
-        cell.layoutSubviews()
-        return cell
+
+        return UITableViewCell()
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

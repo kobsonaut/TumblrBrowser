@@ -57,9 +57,10 @@ class TextPrototypeCell: UITableViewCell {
 
         profileNameView.rightAnchor.constraint(equalTo: self.rightAnchor).isActive = true
         profileNameView.topAnchor.constraint(equalTo: self.topAnchor, constant: 13).isActive = true
-        profileNameView.leftAnchor.constraint(equalTo: self.profileImageView.rightAnchor, constant: 5)
+
 
         profileImageView.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 15).isActive = true
+        profileImageView.rightAnchor.constraint(equalTo: self.profileNameView.leftAnchor, constant: -5).isActive = true
         profileImageView.topAnchor.constraint(equalTo: self.topAnchor, constant: 10).isActive = true
         profileImageView.heightAnchor.constraint(equalToConstant: 40).isActive = true
         profileImageView.widthAnchor.constraint(equalToConstant: 40).isActive = true
