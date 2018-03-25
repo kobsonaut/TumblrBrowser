@@ -25,12 +25,20 @@ class FeedViewController: UITableViewController, UISearchBarDelegate {
         self.tableView.register(TextPrototypeCell.self, forCellReuseIdentifier: "textCell")
         self.tableView.rowHeight = UITableViewAutomaticDimension
         self.tableView.estimatedRowHeight = 300
+
+        self.tableView.separatorStyle = .none
+        if tableView.visibleCells.isEmpty {
+            self.tableView.backgroundView = UIImageView(image: #imageLiteral(resourceName: "launch"))
+        } else {
+            self.tableView.backgroundView = nil
+        }
+
     }
 
     private func fetchTumblrData(withName url: String) {
         let jsonStringURL = URL(string: "https://\(url).tumblr.com/api/read/")
         guard let xml = XML(contentsOf: jsonStringURL!) else { return }
-        print(xml)
+
         if (!xml.description.isEmpty) {
             let postsRange = xml[0][1].children.count
             if postsRange > 0 {
@@ -50,15 +58,20 @@ class FeedViewController: UITableViewController, UISearchBarDelegate {
 
                     } else if postType == "regular" {
                         guard let message = xml[0][1][i]["regular-body"]?.text else { return }
-                        print(message)
-                        let post = TextPost(profileName: name, profileImageURL: profileImageURL, message: message, type: postType)
+                        let decoded = message.stringByDecodingHTMLEntities
+                        let withoutPrefix = decoded.dropFirst(3)
+                        let modifiedMessage = String(withoutPrefix.dropLast(4))
+
+                        let post = TextPost(profileName: name, profileImageURL: profileImageURL, message: modifiedMessage, type: postType)
                         self.posts.append(post)
                     } else {
                         print("Different type.")
                     }
                 }
             } else {
-                print("Out of range.")
+                let alert = UIAlertController(title: "No image or text posts found", message: "Sincerely, we found nothing.", preferredStyle: UIAlertControllerStyle.alert)
+                alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.default, handler: nil))
+                self.present(alert, animated: true, completion: nil)
             }
         } else {
             let alert = UIAlertController(title: "No search results", message: "Sincerely, we found nothing.", preferredStyle: UIAlertControllerStyle.alert)
@@ -112,7 +125,7 @@ class FeedViewController: UITableViewController, UISearchBarDelegate {
             cell.layoutSubviews()
             return cell
         }
-
+        
         return UITableViewCell()
     }
 
@@ -131,6 +144,7 @@ class FeedViewController: UITableViewController, UISearchBarDelegate {
     }
 
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        posts.removeAll()
         fetchTumblrData(withName: searchBar.text!)
         DispatchQueue.main.async {
             self.tableView.reloadData()

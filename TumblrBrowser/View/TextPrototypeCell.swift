@@ -36,6 +36,7 @@ class TextPrototypeCell: UITableViewCell {
         textView.translatesAutoresizingMaskIntoConstraints = false
         textView.isScrollEnabled = false
         textView.font = UIFont.boldSystemFont(ofSize: 14)
+        textView.textAlignment = .justified
         return textView
     }()
 
@@ -65,14 +66,14 @@ class TextPrototypeCell: UITableViewCell {
         profileImageView.heightAnchor.constraint(equalToConstant: 40).isActive = true
         profileImageView.widthAnchor.constraint(equalToConstant: 40).isActive = true
 
-        messageView.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true
-        messageView.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
+        messageView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 15).isActive = true
+        messageView.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -15).isActive = true
         messageView.topAnchor.constraint(equalTo: self.profileImageView.bottomAnchor, constant: 10).isActive = true
 
 
         customSeparatorView.leftAnchor.constraint(equalTo: self.leftAnchor).isActive = true
         customSeparatorView.rightAnchor.constraint(equalTo: self.rightAnchor).isActive = true
-        customSeparatorView.topAnchor.constraint(equalTo: self.messageView.bottomAnchor).isActive = true
+        customSeparatorView.topAnchor.constraint(equalTo: self.messageView.bottomAnchor, constant: 15).isActive = true
         customSeparatorView.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
         customSeparatorView.heightAnchor.constraint(equalToConstant: 15).isActive = true
 
