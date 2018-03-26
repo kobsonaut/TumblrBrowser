@@ -36,7 +36,8 @@ class FeedViewController: UITableViewController, UISearchBarDelegate {
     }
 
     private func fetchTumblrData(withName url: String) {
-        let jsonStringURL = URL(string: "https://\(url).tumblr.com/api/read/")
+        let urlWithoutWhitespaces = url.trimmingCharacters(in: .whitespaces)
+        let jsonStringURL = URL(string: "https://\(urlWithoutWhitespaces).tumblr.com/api/read/")
         guard let xml = XML(contentsOf: jsonStringURL!) else { return }
 
         if (!xml.description.isEmpty) {
