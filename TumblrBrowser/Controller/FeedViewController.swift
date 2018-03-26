@@ -8,6 +8,11 @@
 
 import UIKit
 
+extension String {
+    func removingWhitespaces() -> String {
+        return components(separatedBy: .whitespaces).joined()
+    }
+}
 
 class FeedViewController: UITableViewController, UISearchBarDelegate {
 
@@ -36,7 +41,7 @@ class FeedViewController: UITableViewController, UISearchBarDelegate {
     }
 
     private func fetchTumblrData(withName url: String) {
-        let urlWithoutWhitespaces = url.trimmingCharacters(in: .whitespaces)
+        let urlWithoutWhitespaces = url.removingWhitespaces()
         let jsonStringURL = URL(string: "https://\(urlWithoutWhitespaces).tumblr.com/api/read/")
         guard let xml = XML(contentsOf: jsonStringURL!) else { return }
 
